@@ -1,4 +1,4 @@
-/* Global variables used in the kernel. */
+    /* Global variables used in the kernel. */
 
 /* EXTERN is defined as extern except in table.c. */
 #ifdef _TABLE

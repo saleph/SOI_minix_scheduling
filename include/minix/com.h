@@ -134,6 +134,11 @@
 #	define SYS_PUTS      20	/* fcn code for sys_puts(count, buf) */
 #	define SYS_FINDPROC  21	/* fcn code for sys_findproc(name, &task_nr,
 				   flags) */
+#       define SYS_SETGROUP         22
+#       define SYS_GETGROUP         23
+#       define SYS_SETQUANTUM       24
+#       define SYS_GETQUANTUM       25
+#       define SYS_SETDEFAULTGROUP  26
 
 #define HARDWARE          -1	/* used as source on interrupt generated msgs*/
 

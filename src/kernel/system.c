@@ -146,6 +146,11 @@ FORWARD _PROTOTYPE( int do_getmap, (message *m_ptr) );
 FORWARD _PROTOTYPE( int do_sysctl, (message *m_ptr) );
 FORWARD _PROTOTYPE( int do_puts, (message *m_ptr) );
 FORWARD _PROTOTYPE( int do_findproc, (message *m_ptr) );
+FORWARD _PROTOTYPE( int do_setgroup, (message *m_ptr) );
+FORWARD _PROTOTYPE( int do_getgroup, (message *m_ptr) );
+FORWARD _PROTOTYPE( int do_setquantum, (message *m_ptr) );
+FORWARD _PROTOTYPE( int do_getquantum, (message *m_ptr) );
+FORWARD _PROTOTYPE( int do_setdefaultgroup, (message *m_ptr) );
 
 
 /*===========================================================================*
@@ -161,32 +166,67 @@ PUBLIC void sys_task()
 	receive(ANY, &m);
 
 	switch (m.m_type) {	/* which system call */
-	    case SYS_FORK:	r = do_fork(&m);	break;
-	    case SYS_NEWMAP:	r = do_newmap(&m);	break;
-	    case SYS_GETMAP:	r = do_getmap(&m);	break;
-	    case SYS_EXEC:	r = do_exec(&m);	break;
-	    case SYS_XIT:	r = do_xit(&m);		break;
-	    case SYS_GETSP:	r = do_getsp(&m);	break;
-	    case SYS_TIMES:	r = do_times(&m);	break;
-	    case SYS_ABORT:	r = do_abort(&m);	break;
-	    case SYS_SENDSIG:	r = do_sendsig(&m);	break;
-	    case SYS_SIGRETURN: r = do_sigreturn(&m);	break;
-	    case SYS_KILL:	r = do_kill(&m);	break;
-	    case SYS_ENDSIG:	r = do_endsig(&m);	break;
-	    case SYS_COPY:	r = do_copy(&m);	break;
-            case SYS_VCOPY:	r = do_vcopy(&m);	break;
-	    case SYS_MEM:	r = do_mem(&m);		break;
-	    case SYS_UMAP:	r = do_umap(&m);	break;
-	    case SYS_TRACE:	r = do_trace(&m);	break;
-	    case SYS_SYSCTL:	r = do_sysctl(&m);	break;
-	    case SYS_PUTS:	r = do_puts(&m);	break;
-	    case SYS_FINDPROC:	r = do_findproc(&m);	break;
+        case SYS_FORK:	r = do_fork(&m);	break;
+        case SYS_NEWMAP:	r = do_newmap(&m);	break;
+        case SYS_GETMAP:	r = do_getmap(&m);	break;
+        case SYS_EXEC:	r = do_exec(&m);	break;
+        case SYS_XIT:	r = do_xit(&m);		break;
+        case SYS_GETSP:	r = do_getsp(&m);	break;
+        case SYS_TIMES:	r = do_times(&m);	break;
+        case SYS_ABORT:	r = do_abort(&m);	break;
+        case SYS_SENDSIG:	r = do_sendsig(&m);	break;
+        case SYS_SIGRETURN: r = do_sigreturn(&m);	break;
+        case SYS_KILL:	r = do_kill(&m);	break;
+        case SYS_ENDSIG:	r = do_endsig(&m);	break;
+        case SYS_COPY:	r = do_copy(&m);	break;
+        case SYS_VCOPY:	r = do_vcopy(&m);	break;
+        case SYS_MEM:	r = do_mem(&m);		break;
+        case SYS_UMAP:	r = do_umap(&m);	break;
+        case SYS_TRACE:	r = do_trace(&m);	break;
+        case SYS_SYSCTL:	r = do_sysctl(&m);	break;
+        case SYS_PUTS:	r = do_puts(&m);	break;
+        case SYS_FINDPROC:	r = do_findproc(&m);	break;
+        case SYS_SETGROUP:      r = do_setgroup(&m); break;
+        case SYS_GETGROUP:      r = do_getgroup(&m); break;
+        case SYS_GETQUANTUM:    r = do_getquantum(&m); break;
+        case SYS_SETQUANTUM:    r = do_setquantum(&m); break;
+        case SYS_SETDEFAULTGROUP: r = do_setdefaultgroup(&m); break;
 	    default:		r = E_BAD_FCN;
 	}
 
 	m.m_type = r;		/* 'r' reports status of call */
 	send(m.m_source, &m);	/* send reply to caller */
   }
+}
+
+PRIVATE int do_setgroup(m_ptr)
+register message *m_ptr;
+{
+
+}
+
+PRIVATE int do_getgroup(m_ptr)
+register message *m_ptr;
+{
+
+}
+
+PRIVATE int do_setquantum(m_ptr)
+register message *m_ptr;
+{
+
+}
+
+PRIVATE int do_getquantum(m_ptr)
+register message *m_ptr;
+{
+
+}
+
+PRIVATE int do_setdefaultgroup(m_ptr)
+register message *m_ptr;
+{
+
 }
 
 
@@ -235,6 +275,7 @@ register message *m_ptr;	/* pointer to request message */
   rpc->sys_time = 0;
   rpc->child_utime = 0;
   rpc->child_stime = 0;
+  rpc->p_group = DEFAULT_GROUP;
 
   return(OK);
 }

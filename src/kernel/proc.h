@@ -8,12 +8,6 @@
  * 'proc', be sure to change sconst.h to match.
  */
 
-#define GROUP_A 0
-#define GROUP_B 1
-#define GROUP_C 2
-
-int quants_for_group[3] = { 5, 10, 15 };
-
 struct proc {
   struct stackframe_s p_reg;	/* process' registers saved in stack frame */
 
@@ -118,5 +112,11 @@ EXTERN struct proc *pproc_addr[NR_TASKS + NR_PROCS];
 EXTERN struct proc *bill_ptr;	/* ptr to process to bill for clock ticks */
 EXTERN struct proc *rdy_head[NQ];	/* pointers to ready list headers */
 EXTERN struct proc *rdy_tail[NQ];	/* pointers to ready list tails */
+EXTERN int quants_for_group[NQ];
+EXTERN char current_group;
+
+EXTERN char DEFAULT_GROUP;
+
+#define GETNEXTGROUP() ((((current_group-2)+1) % 3)+2)
 
 #endif /* PROC_H */

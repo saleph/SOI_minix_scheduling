@@ -47,6 +47,7 @@ PUBLIC void main()
    */
   for (rp = BEG_PROC_ADDR, t = -NR_TASKS; rp < END_PROC_ADDR; ++rp, ++t) {
 	rp->p_nr = t;		/* proc number from ptr */
+        rp->p_group = DEFAULT_GROUP;
         (pproc_addr + NR_TASKS)[t] = rp;        /* proc ptr from number */
   }
 

@@ -1,4 +1,4 @@
-#define NCALLS		  78	/* number of system calls allowed */
+#define NCALLS		  83	/* number of system calls allowed */
 
 #define EXIT		   1 
 #define FORK		   2 
@@ -65,3 +65,8 @@
 
 #define REBOOT		  76
 #define SVRCTL		  77
+#define SETGROUP          78
+#define GETGROUP          79
+#define SETQUANTUM        80
+#define GETQUANTUM        81
+#define SETDEFAULTGROUP   82
