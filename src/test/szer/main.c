@@ -5,14 +5,12 @@
 #include <limits.h>
 
 
-typedef enum group {
-    GROUP_A = 2,
-    GROUP_B,
-    GROUP_C
-} group;
+#define GROUP_A 2
+#define GROUP_B 3
+#define GROUP_C 4
 
-#define GRTOCHAR(g) (g==2 ? 'A' : (g==1 ? 'B' : 'C'))
-#define CHARTOGR(c) (c=='A' ? 2 : (c=='B' ? 3 : 4))
+#define GRTOCHAR(g) (g==GROUP_A ? 'A' : (g==GROUP_B ? 'B' : 'C'))
+#define CHARTOGR(c) (c=='A' ? GROUP_A : (c=='B' ? GROUP_B : GROUP_C))
 
 int getgroup(int pid);
 void setgroup(int pid, int group);
@@ -59,7 +57,7 @@ int main(int argc, char* argv[]){
     groupval = getgroup(pid);
     printf("Process pid (%d) group: %c\n", pid, GRTOCHAR(groupval));
 
-    i = INT_MAX / 2;
+    i = INT_MAX / 5 * 4 ;
     while(i < INT_MAX){
         ++i;
     }
