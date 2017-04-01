@@ -51,7 +51,7 @@
 #include "proc.h"
 
 /* Constant definitions. */
-#define MILLISEC         100	/* how often to call the scheduler (msec) */
+#define MILLISEC         10	/* how often to call the scheduler (msec) */
 #define SCHED_RATE (MILLISEC*HZ/1000)	/* number of ticks per schedule */
 
 /* Clock parameters. */
@@ -468,14 +468,14 @@ int irq;
   if (next_alarm <= now ||
       sched_ticks == 1 &&
       bill_ptr == prev_ptr &&
-      (rdy_head[USER_Q_A] != NIL_PROC || rdy_head[USER_Q_B] != NIL_PROC || rdy_head[USER_Q_C] != NIL_PROC)) {
+      rdy_head[USER_Q] != NIL_PROC) {
 	interrupt(CLOCK);
 	return 1;	/* Reenable interrupts */
   }
 
   if (--sched_ticks == 0) {
 	/* If bill_ptr == prev_ptr, no ready users so don't need sched(). */
-        sched_ticks = SCHED_RATE * quants_for_group[current_group];	/* reset quantum */
+	sched_ticks = SCHED_RATE;	/* reset quantum */
 	prev_ptr = bill_ptr;		/* new previous process */
   }
   return 1;	/* Reenable clock interrupt */

@@ -8,6 +8,7 @@
  * 'proc', be sure to change sconst.h to match.
  */
 
+
 struct proc {
   struct stackframe_s p_reg;	/* process' registers saved in stack frame */
 
@@ -52,12 +53,10 @@ struct proc {
   message *p_messbuf;		/* pointer to message buffer */
   int p_getfrom;		/* from whom does process want to receive? */
   int p_sendto;
-
+  int p_group;
   struct proc *p_nextready;	/* pointer to next ready process */
   sigset_t p_pending;		/* bit map for pending signals */
   unsigned p_pendcount;		/* count of pending and unfinished signals */
-
-  char p_group;                 /* process group */
 
   char p_name[16];		/* name of the process */
 };
@@ -112,12 +111,15 @@ EXTERN struct proc *pproc_addr[NR_TASKS + NR_PROCS];
 EXTERN struct proc *bill_ptr;	/* ptr to process to bill for clock ticks */
 EXTERN struct proc *rdy_head[NQ];	/* pointers to ready list headers */
 EXTERN struct proc *rdy_tail[NQ];	/* pointers to ready list tails */
-EXTERN int quants_for_group[NQ];
-EXTERN char current_group;
 
-EXTERN char DEFAULT_GROUP;
 
-#define GETNEXTGROUP() ((((current_group-2)+1) % 3)+2)
-#define ISVALIDGROUP(x) (x>=2 && x<=4)
+#define GROUP_A 0
+#define GROUP_B 1
+#define GROUP_C 2
+
+EXTERN int quants_for_group[3];
+EXTERN int current_group;
+EXTERN int DEFAULT_GROUP;
+EXTERN int sched_ticks;
 
 #endif /* PROC_H */

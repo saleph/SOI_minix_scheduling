@@ -19,6 +19,10 @@
 #include <minix/com.h>
 #include "proc.h"
 
+int quants_for_group[3] = { 5, 10, 15 };
+int current_group = GROUP_C;
+int DEFAULT_GROUP = GROUP_C;
+
 PRIVATE unsigned char switching;	/* nonzero to inhibit interrupt() */
 
 FORWARD _PROTOTYPE( int mini_send, (struct proc *caller_ptr, int dest,
@@ -44,10 +48,6 @@ FORWARD _PROTOTYPE( void cp_mess, (int src, struct proc *src_p, message *src_m,
 #define CopyMess(s,sp,sm,dp,dm) \
 	cp_mess(s,sp,sm,dp,dm)
 #endif
-
-int quants_for_group[NQ] = { 0, 0, 5, 10, 15 };
-char current_group = USER_Q_C;
-char DEFAULT_GROUP = USER_Q_C;
 
 /*===========================================================================*
  *				interrupt				     * 
@@ -311,7 +311,6 @@ PRIVATE void pick_proc()
  */
 
   register struct proc *rp;	/* process to run */
-  int i;
 
   if ( (rp = rdy_head[TASK_Q]) != NIL_PROC) {
 	proc_ptr = rp;
@@ -321,14 +320,10 @@ PRIVATE void pick_proc()
 	proc_ptr = rp;
 	return;
   }
-
-  for (i=0; i<3; ++i) {
-      if ( (rp = rdy_head[current_group]) != NIL_PROC) {
-            proc_ptr = rp;
-            bill_ptr = rp;
-            return;
-      }
-      current_group = GETNEXTGROUP();
+  if ( (rp = rdy_head[USER_Q]) != NIL_PROC) {
+	proc_ptr = rp;
+	bill_ptr = rp;
+	return;
   }
   /* No one is ready.  Run the idle task.  The idle task might be made an
    * always-ready user task to avoid this special case.
@@ -348,7 +343,7 @@ register struct proc *rp;	/* this process is now runnable */
  *   SERVER_Q - (middle priority) for MM and FS only
  *   USER_Q   - (lowest priority) for user processes
  */
-  char this_group;
+
   if (istaskp(rp)) {
 	if (rdy_head[TASK_Q] != NIL_PROC)
 		/* Add to tail of nonempty queue. */
@@ -373,11 +368,10 @@ register struct proc *rp;	/* this process is now runnable */
   /* Add user process to the front of the queue.  (Is a bit fairer to I/O
    * bound processes.)
    */
-  this_group = rp->p_group;
-  if (rdy_head[this_group] == NIL_PROC)
-        rdy_tail[this_group] = rp;
-  rp->p_nextready = rdy_head[this_group];
-  rdy_head[this_group] = rp;
+  if (rdy_head[USER_Q] == NIL_PROC)
+	rdy_tail[USER_Q] = rp;
+  rp->p_nextready = rdy_head[USER_Q];
+  rdy_head[USER_Q] = rp;
 }
 
 /*===========================================================================*
@@ -417,17 +411,16 @@ register struct proc *rp;	/* this process is no longer runnable */
 	}
 	qtail = &rdy_tail[SERVER_Q];
   } else {
-        char this_group = rp->p_group;
-        if ( (xp = rdy_head[this_group]) == NIL_PROC) return;
+	if ( (xp = rdy_head[USER_Q]) == NIL_PROC) return;
 	if (xp == rp) {
-                rdy_head[this_group] = xp->p_nextready;
+		rdy_head[USER_Q] = xp->p_nextready;
 #if (CHIP == M68000)
 		if (rp == proc_ptr)
 #endif
 		pick_proc();
 		return;
 	}
-        qtail = &rdy_tail[this_group];
+	qtail = &rdy_tail[USER_Q];
   }
 
   /* Search body of queue.  A process can be made unready even if it is
@@ -443,6 +436,8 @@ register struct proc *rp;	/* this process is no longer runnable */
  *				sched					     * 
  *===========================================================================*/
 
+#define GETNEXTGROUP(g) ((g+1)%3)
+
 PRIVATE void sched()
 {
 /* The current process has run too long.  If another low priority (user)
@@ -450,13 +445,28 @@ PRIVATE void sched()
  * possibly promoting another user to head of the queue.
  */
 
-  if (rdy_head[current_group] == NIL_PROC) return;
+  int i;
+  int group;
+  struct proc *prev_proc;
+  struct proc *pr;
+  if (rdy_head[USER_Q] == NIL_PROC) return;
 
   /* One or more user processes queued. */
-  rdy_tail[current_group]->p_nextready = rdy_head[current_group];
-  rdy_tail[current_group] = rdy_head[current_group];
-  rdy_head[current_group] = rdy_head[current_group]->p_nextready;
-  rdy_tail[current_group]->p_nextready = NIL_PROC;
+  rdy_tail[USER_Q]->p_nextready = rdy_head[USER_Q];
+  rdy_tail[USER_Q] = rdy_head[USER_Q];
+  rdy_head[USER_Q] = rdy_head[USER_Q]->p_nextready;
+  rdy_tail[USER_Q]->p_nextready = NIL_PROC;
+
+  group = current_group;
+  /* find next group */
+  for (i = 0; i<3; ++i) {
+      group = GETNEXTGROUP(group);
+
+      for (pr = rdy_head[USER_Q];
+           pr != NIL_PROC && pr->p_group != current_group;
+           pr = pr->p_nextready)
+      { }
+  }
   pick_proc();
 }
 
