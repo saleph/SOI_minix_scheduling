@@ -20,7 +20,6 @@
 #include "proc.h"
 
 int quants_for_group[3] = { 5, 10, 15 };
-int current_group = GROUP_C;
 int DEFAULT_GROUP = GROUP_C;
 
 PRIVATE unsigned char switching;	/* nonzero to inhibit interrupt() */
@@ -440,34 +439,64 @@ register struct proc *rp;	/* this process is no longer runnable */
 
 PRIVATE void sched()
 {
-/* The current process has run too long.  If another low priority (user)
- * process is runnable, put the current process on the end of the user queue,
- * possibly promoting another user to head of the queue.
- */
+    /* The current process has run too long.  If another low priority (user)
+    * process is runnable, put the current process on the end of the user queue,
+    * possibly promoting another user to head of the queue.
+    */
 
-  int i;
-  int group;
-  struct proc *prev_proc;
-  struct proc *pr;
-  if (rdy_head[USER_Q] == NIL_PROC) return;
+    struct proc *pr, *head, *prevpr;
+    int i, quants_for_pr, current_group;
 
-  /* One or more user processes queued. */
-  rdy_tail[USER_Q]->p_nextready = rdy_head[USER_Q];
-  rdy_tail[USER_Q] = rdy_head[USER_Q];
-  rdy_head[USER_Q] = rdy_head[USER_Q]->p_nextready;
-  rdy_tail[USER_Q]->p_nextready = NIL_PROC;
+    if (rdy_head[USER_Q] == NIL_PROC) return;
 
-  group = current_group;
-  /* find next group */
-  for (i = 0; i<3; ++i) {
-      group = GETNEXTGROUP(group);
+    head = rdy_head[USER_Q];
+    head->quants_spent += 1;
+    current_group = head->p_group;
 
-      for (pr = rdy_head[USER_Q];
-           pr != NIL_PROC && pr->p_group != current_group;
-           pr = pr->p_nextready)
-      { }
-  }
-  pick_proc();
+    switch(current_group){
+    case GROUP_A: quants_for_pr = quants_for_group[GROUP_A]; break;
+    case GROUP_B: quants_for_pr = quants_for_group[GROUP_B]; break;
+    default: quants_for_pr = quants_for_group[GROUP_C];
+    }
+
+    if (head->quants_spent <= quants_for_pr){
+        pick_proc();
+        return;
+    }
+
+    head->quants_spent = 0;
+
+    rdy_tail[USER_Q]->p_nextready = rdy_head[USER_Q];
+    rdy_tail[USER_Q] = rdy_head[USER_Q];
+    rdy_head[USER_Q] = rdy_head[USER_Q]->p_nextready;
+    rdy_tail[USER_Q]->p_nextready = NIL_PROC;
+
+    head = rdy_head[USER_Q];
+
+    for (i = 0; i < 3; ++i){
+        pr = head;
+        current_group = GETNEXTGROUP(current_group);
+
+        while (pr != NIL_PROC && pr->p_group != current_group) {
+            prevpr = pr;
+            pr = pr->p_nextready;
+        }
+        if (pr != NIL_PROC && pr->p_group == current_group) {
+            break;
+        }
+    }
+
+    if (pr != rdy_head[USER_Q]) {
+        prevpr->p_nextready = pr->p_nextready;
+        if (prevpr->p_nextready == NIL_PROC) {
+            rdy_tail[USER_Q] = prevpr;
+        }
+
+        pr->p_nextready = rdy_head[USER_Q];
+        rdy_head[USER_Q] = pr;
+    }
+
+    pick_proc();
 }
 
 /*==========================================================================*

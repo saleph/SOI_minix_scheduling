@@ -54,6 +54,7 @@ struct proc {
   int p_getfrom;		/* from whom does process want to receive? */
   int p_sendto;
   int p_group;
+  int quants_spent;
   struct proc *p_nextready;	/* pointer to next ready process */
   sigset_t p_pending;		/* bit map for pending signals */
   unsigned p_pendcount;		/* count of pending and unfinished signals */
@@ -118,8 +119,6 @@ EXTERN struct proc *rdy_tail[NQ];	/* pointers to ready list tails */
 #define GROUP_C 2
 
 EXTERN int quants_for_group[3];
-EXTERN int current_group;
 EXTERN int DEFAULT_GROUP;
-EXTERN int sched_ticks;
 
 #endif /* PROC_H */

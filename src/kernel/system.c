@@ -208,7 +208,6 @@ register message *m_ptr;
     procpid = m_ptr->PROCPID;
     group = m_ptr->GROUP;
 
-       /* WARNING!!! - IT MAY CAUSE ERRORS - CHECKING IN_USE FLAG */
     for (pr = BEG_USER_ADDR; pr < END_PROC_ADDR; ++pr) {
         if (pr->p_pid == procpid){
             pr->p_group = group;
@@ -308,7 +307,7 @@ register message *m_ptr;	/* pointer to request message */
   rpc->sys_time = 0;
   rpc->child_utime = 0;
   rpc->child_stime = 0;
-  rpc->p_group = DEFAULT_GROUP;
+  rpc->p_group = rpc->p_group;
 
   return(OK);
 }

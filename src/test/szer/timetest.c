@@ -3,9 +3,9 @@
 #include <lib.h>
 
 
-#define GROUP_A 2
-#define GROUP_B 3
-#define GROUP_C 4
+#define GROUP_A 0
+#define GROUP_B 1
+#define GROUP_C 2
 
 #define GRTOCHAR(g) (g==GROUP_A ? 'A' : (g==GROUP_B ? 'B' : 'C'))
 #define CHARTOGR(c) (c=='A' ? GROUP_A : (c=='B' ? GROUP_B : GROUP_C))
@@ -20,7 +20,7 @@ void settime(int group, int time){
     _syscall(MM, SETQUANTUM, &m);
 }
 
-int gettime(int group){
+int gettime(int group) {
     message m;
     m.m1_i2 = group;
 

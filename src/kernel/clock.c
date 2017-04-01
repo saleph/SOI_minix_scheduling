@@ -51,7 +51,7 @@
 #include "proc.h"
 
 /* Constant definitions. */
-#define MILLISEC         10	/* how often to call the scheduler (msec) */
+#define MILLISEC         100	/* how often to call the scheduler (msec) */
 #define SCHED_RATE (MILLISEC*HZ/1000)	/* number of ticks per schedule */
 
 /* Clock parameters. */
@@ -184,7 +184,7 @@ PRIVATE void do_clocktick()
   /* If a user process has been running too long, pick another one. */
   if (--sched_ticks == 0) {
 	if (bill_ptr == prev_ptr) lock_sched();	/* process has run too long */
-        sched_ticks = SCHED_RATE * quants_for_group[current_group];		/* reset quantum */
+        sched_ticks = SCHED_RATE;		/* reset quantum */
 	prev_ptr = bill_ptr;			/* new previous process */
   }
 }
