@@ -65,6 +65,8 @@
 
 #define REBOOT		  76
 #define SVRCTL		  77
+
+
 #define SETGROUP          78
 #define GETGROUP          79
 #define SETQUANTUM        80

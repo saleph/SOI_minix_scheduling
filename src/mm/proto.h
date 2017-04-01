@@ -37,11 +37,11 @@ _PROTOTYPE( int do_getset, (void)					);
 
 /* main.c */
 _PROTOTYPE( void main, (void)						);
-_PROTOTYPE( void do_getgroup, (void)						);
-_PROTOTYPE( void do_setgroup, (void)						);
-_PROTOTYPE( void do_getquantum, (void)						);
-_PROTOTYPE( void do_setquantum, (void)						);
-_PROTOTYPE( void do_setdefaultgroup, (void)						);
+_PROTOTYPE( int do_getgroup, (void)						);
+_PROTOTYPE( int do_setgroup, (void)						);
+_PROTOTYPE( int do_getquantum, (void)						);
+_PROTOTYPE( int do_setquantum, (void)						);
+_PROTOTYPE( int do_setdefaultgroup, (void)						);
 
 /* misc.c */
 _PROTOTYPE( int do_reboot, (void)					);

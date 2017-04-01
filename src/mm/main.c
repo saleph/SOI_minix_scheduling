@@ -179,32 +179,32 @@ PRIVATE void mm_init()
   }
 }
 
-PUBLIC void do_setgroup() {
+PUBLIC int do_setgroup() {
     message m;
     m = mm_in;
-    _taskcall(SYSTASK, SYS_SETGROUP, &m);
+    return _taskcall(SYSTASK, SYS_SETGROUP, &m);
 }
 
-PUBLIC void do_getgroup() {
+PUBLIC int do_getgroup() {
     message m;
     m = mm_in;
-    _taskcall(SYSTASK, SYS_GETGROUP, &m);
+    return _taskcall(SYSTASK, SYS_GETGROUP, &m);
 }
 
-PUBLIC void do_setquantum() {
+PUBLIC int do_setquantum() {
     message m;
     m = mm_in;
-    _taskcall(SYSTASK, SYS_SETQUANTUM, &m);
+    return _taskcall(SYSTASK, SYS_SETQUANTUM, &m);
 }
 
-PUBLIC void do_getquantum() {
+PUBLIC int do_getquantum() {
     message m;
     m = mm_in;
-    _taskcall(SYSTASK, SYS_GETQUANTUM, &m);
+    return _taskcall(SYSTASK, SYS_GETQUANTUM, &m);
 }
 
-PUBLIC void do_setdefaultgroup() {
+PUBLIC int do_setdefaultgroup() {
     message m;
     m = mm_in;
-    _taskcall(SYSTASK, SYS_SETDEFAULTGROUP, &m);
+    return _taskcall(SYSTASK, SYS_SETDEFAULTGROUP, &m);
 }

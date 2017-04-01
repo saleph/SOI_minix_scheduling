@@ -202,31 +202,81 @@ PUBLIC void sys_task()
 PRIVATE int do_setgroup(m_ptr)
 register message *m_ptr;
 {
+    pid_t procpid;
+    char group;
+    struct proc *pr;
+    procpid = m_ptr->PROCPID;
+    group = m_ptr->GROUP;
 
+       /* WARNING!!! - IT MAY CAUSE ERRORS - CHECKING IN_USE FLAG */
+    for (pr = BEG_USER_ADDR; pr != END_PROC_ADDR; ++pr) {
+        if (istaskp(pr) || isservp(pr)) continue;
+        if (pr->p_pid == procpid)
+            break;
+    }
+    if (pr == END_PROC_ADDR) {
+        return (ESRCH); /* no such process */
+    }
+    lock_unready(pr);
+    pr->p_group = group;
+    lock_ready(pr);
+    return (OK);
 }
 
 PRIVATE int do_getgroup(m_ptr)
 register message *m_ptr;
 {
+    pid_t procpid;
+    char group;
+    struct proc *pr;
+    procpid = m_ptr->PROCPID;
 
+    for (pr = BEG_USER_ADDR; pr != END_PROC_ADDR; ++pr) {
+        if (istaskp(pr) || isservp(pr)) continue;
+        if (pr->p_pid == procpid)
+            break;
+    }
+    if (pr == END_PROC_ADDR) {
+        return (ESRCH); /* no such process */
+    }
+    return (m_ptr->GROUP = pr->p_group);
 }
 
 PRIVATE int do_setquantum(m_ptr)
 register message *m_ptr;
 {
-
+    char group;
+    int quantum;
+    group = m_ptr->GROUP;
+    quantum = m_ptr->QUANTUM;
+    if (!ISVALIDGROUP(group)) {
+        return (ENOENT);
+    }
+    quants_for_group[group] = quantum;
+    return (OK);
 }
 
 PRIVATE int do_getquantum(m_ptr)
 register message *m_ptr;
 {
-
+    char group;
+    group = m_ptr->GROUP;
+    if (!ISVALIDGROUP(group)) {
+        return (ENOENT);
+    }
+    return (m_ptr->QUANTUM = quants_for_group[group]);
 }
 
 PRIVATE int do_setdefaultgroup(m_ptr)
 register message *m_ptr;
 {
-
+    char group;
+    group = m_ptr->GROUP;
+    if (!ISVALIDGROUP(group)) {
+        return (ENOENT);
+    }
+    DEFAULT_GROUP = group;
+    return (OK);
 }
 
 

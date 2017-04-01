@@ -118,5 +118,6 @@ EXTERN char current_group;
 EXTERN char DEFAULT_GROUP;
 
 #define GETNEXTGROUP() ((((current_group-2)+1) % 3)+2)
+#define ISVALIDGROUP(x) (x>=2 && x<=4)
 
 #endif /* PROC_H */
